@@ -11,8 +11,8 @@ export default function Header({ className }: { className?: string }) {
       <Image
         src={OnsembleLogo}
         alt="onsemble-logo-logo"
-        width="230"
-        height="50"
+        width="40"
+        height="40"
         className="ml-3"
       />{" "}
     </header>
