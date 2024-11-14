@@ -50,13 +50,48 @@ export const Context: React.FC<ContextProps> = ({ className, selected }) => {
     </div>
   ));
 
+  const [newUrl, setUrl] = useState("");
+  const urlFormSubmit = () => {
+    crawlDocument(
+      newUrl,
+      setEntries,
+      setCards,
+      splittingMethod,
+      chunkSize,
+      overlap
+    )
+  };
+
   return (
     <div
       className={`flex flex-col border-2 overflow-y-auto rounded-lg border-gray-500 w-full ${className}`}
     >
       <div className="flex flex-col items-start sticky top-0 w-full">
-        <div className="flex flex-col items-start lg:flex-row w-full lg:flex-wrap p-2">
+        {/*         <div className="flex flex-col items-start lg:flex-row w-full lg:flex-wrap p-2">
           {buttons}
+        </div> */}
+        <div
+          className="flex flex-row"
+          style={{ width: "100%", padding: "10px", justifyContent: "space-between" }}
+        >
+          <div
+            className="flex flex-2"
+            style={{ marginRight: "20px" }}
+          >
+            <input
+              type="text"
+              className="flex input-glow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline pl-3 pr-10 bg-gray-600 border-gray-600 transition-shadow duration-200"
+              value={newUrl}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+          </div>
+          <Button
+            className="flex flex-2 items-center text-gray-400 border bg-white"
+            style={{ borderRadius: "5px" }}
+            onClick={urlFormSubmit}
+          >
+            Test
+          </Button>
         </div>
         <div className="flex-grow w-full px-4">
           <Button
