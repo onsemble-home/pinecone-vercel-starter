@@ -75,7 +75,7 @@ export const Context: React.FC<ContextProps> = ({ className, selected }) => {
           style={{ width: "100%", padding: "10px", justifyContent: "space-between" }}
         >
           <div
-            className="flex flex-2"
+            className="flex flex-4"
             style={{ marginRight: "20px" }}
           >
             <input
@@ -90,7 +90,7 @@ export const Context: React.FC<ContextProps> = ({ className, selected }) => {
             style={{ borderRadius: "5px" }}
             onClick={urlFormSubmit}
           >
-            Test
+            Crawl URL and add data to index
           </Button>
         </div>
         <div className="flex-grow w-full px-4">
