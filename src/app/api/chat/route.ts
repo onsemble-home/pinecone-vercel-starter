@@ -2,7 +2,7 @@
 import { Message } from 'ai'
 import { getContext } from '@/utils/context'
 import { openai } from '@ai-sdk/openai';
-import { generateText } from 'ai';
+import { streamText, generateText } from 'ai';
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
@@ -42,12 +42,22 @@ export async function POST(req: Request) {
       },
     ]
 
-    const generatedResult = await generateText({
-        model: openai("gpt-4o"),
-        messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
-    });
+    if (req.headers.get('X-Client-Type') == 'ReactNative') {
+        console.log('Generating text for React Native client')
+        const generatedResult = await generateText({
+            model: openai("gpt-4o"),
+            messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
+        });
+        return new Response(generatedResult.text, { status: 200 });
+    } else {
+        console.log('Streaming text for web client')
+        const result = await streamText({
+            model: openai("gpt-4o"),
+            messages: [...prompt, ...messages.filter((message: Message) => message.role === 'user')]
+        });
+        return result.toDataStreamResponse();
+    }
 
-    return new Response(generatedResult.text, { status: 200 });
   } catch (e) {
     throw (e)
   }
