@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       },
     ]
 
-    if (req.headers.get('X-Client-Type') == 'ReactNative') {
+    if (req.headers.get('X-Client-Type') === 'ReactNative') {
         console.log('Generating text for React Native client')
         const generatedResult = await generateText({
             model: openai("gpt-4o"),
