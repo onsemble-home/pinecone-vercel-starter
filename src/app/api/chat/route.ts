@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1]
 
     // Get the context from the last message
-    const context = await getContext(typeof lastMessage.content == 'string' ? lastMessage.content : lastMessage.content[0].text, '')
+    const context = await getContext(typeof lastMessage.content === 'string' ? lastMessage.content : lastMessage.content[0].text, '')
 
     const prompt = [
       {
