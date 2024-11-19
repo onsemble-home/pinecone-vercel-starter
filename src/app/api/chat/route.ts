@@ -2,7 +2,7 @@
 import { Message } from 'ai'
 import { getContext } from '@/utils/context'
 import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { streamText, generateText } from 'ai';
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1]
 
     // Get the context from the last message
-    const context = await getContext(lastMessage.content, '')
+    const context = await getContext(typeof lastMessage.content === 'string' ? lastMessage.content : lastMessage.content[0].text, '')
 
     const prompt = [
       {
@@ -34,16 +34,30 @@ export async function POST(req: Request) {
       If the context does not provide the answer to question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
       AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
       AI assistant will not invent anything that is not drawn directly from the context.
+      AI assistant is knowledgeable about the installation of heat pump water heaters.
+      AI's goal when asked about incentives for installation of heat pump water heaters is to determine a total amount that the user is eligible for.
+      Please ask followup questions that are required to determine eligibility based on what is known about incentive criteria.
+      Try to get the information needed to determine a total amount before describing the incentives, and make sure to be aware of income qualification status, the type of conversion, and the size of the water heater if any of these are relevant to incentive qualification.
       `,
       },
     ]
 
-    const result = await streamText({
-      model: openai("gpt-4o"),
-      messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
-    });
+    if (req.headers.get('X-Client-Type') === 'ReactNative') {
+        console.log('Generating text for React Native client')
+        const generatedResult = await generateText({
+            model: openai("gpt-4o"),
+            messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
+        });
+        return new Response(generatedResult.text, { status: 200 });
+    } else {
+        console.log('Streaming text for web client')
+        const result = await streamText({
+            model: openai("gpt-4o"),
+            messages: [...prompt, ...messages.filter((message: Message) => message.role === 'user')]
+        });
+        return result.toDataStreamResponse();
+    }
 
-    return result.toDataStreamResponse();
   } catch (e) {
     throw (e)
   }
