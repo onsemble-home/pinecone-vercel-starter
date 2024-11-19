@@ -2,7 +2,7 @@
 import { Message } from 'ai'
 import { getContext } from '@/utils/context'
 import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { generateText } from 'ai';
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1]
 
     // Get the context from the last message
-    const context = await getContext(lastMessage.content, '')
+    const context = await getContext(typeof lastMessage.content == 'string' ? lastMessage.content : lastMessage.content[0].text, '')
 
     const prompt = [
       {
@@ -42,12 +42,12 @@ export async function POST(req: Request) {
       },
     ]
 
-    const result = await streamText({
-      model: openai("gpt-4o"),
-      messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
+    const generatedResult = await generateText({
+        model: openai("gpt-4o"),
+        messages: [...prompt,...messages.filter((message: Message) => message.role === 'user')]
     });
 
-    return result.toDataStreamResponse();
+    return new Response(generatedResult.text, { status: 200 });
   } catch (e) {
     throw (e)
   }
